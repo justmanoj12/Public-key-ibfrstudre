@@ -170,32 +170,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function deleteChat(chatId) {
-        if (!confirm('Delete this conversation?')) return;
-        
+        // Remove from storage
         localStorage.removeItem(`chat-${chatId}`);
+        
+        // Update chat history
         chatHistory = chatHistory.filter(chat => chat.id !== chatId);
         localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
         
+        // If deleting current chat, start new one
         if (chatId === sessionId) startNewChat();
+        
+        // Refresh recent chats list
         loadRecentChats();
     }
-
+    
     function clearAllChats() {
-        if (!confirm('Delete ALL conversation history?')) return;
-        
+        // Remove all chats from storage
         chatHistory.forEach(chat => localStorage.removeItem(`chat-${chat.id}`));
+        
+        // Clear history
         chatHistory = [];
         localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
         
+        // Start fresh chat
         startNewChat();
     }
 
     function startNewChat() {
         // Confirm if current chat has messages
         if (currentChat.length > 0) {
-            if (!confirm('Start new chat? Your current conversation will be saved.')) {
-                return; // User canceled
-            }
             updateChatHistory(); // Save current chat first
         }
     

@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
         typingIndicator = addMessage('<div class="typing-indicator"><span></span><span></span><span></span></div>', 'bot-message');
         
         try {
-            const response = await fetch('http://localhost:3000/chat', {
+            const response = await fetch('https://goal-setting-assistant-server.onrender.com/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message, sessionId })

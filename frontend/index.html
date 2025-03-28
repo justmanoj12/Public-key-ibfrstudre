@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Setting Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Goal Setting Assistant</div>
+        <button class="new-chat-btn" id="new-chat-btn">
+            <span class="btn-icon">+</span> New chat
+        </button>
+        
+        <div class="section-title">Recent</div>
+        <div class="recent-chats" id="recent-chats">
+            <!-- Recent chats will be populated here with delete buttons -->
+        </div>
+        
+        <div class="about-section">
+            <div class="section-title">About Us</div>
+            <div class="team-member">Ayushman Baghel (12304253)</div>
+            <div class="team-member">Harmandeep Singh (12303841)</div>
+            <div class="team-member">Omvesh Singh (12304489)</div>
+        </div>
+        
+        <div class="user-info">
+            Hello, User
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="chat-container" id="chat-log">
+            <!-- Chat messages will appear here -->
+            <div class="welcome-message">
+                <h2>Welcome to Goal Setting Assistant</h2>
+                <p>Start a new conversation or continue a previous one</p>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Ask Chatbot">
+            <button id="send-button">
+                <svg class="send-icon" viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="copyright-notice">
+            &copy; 2025 Goal Setting Assistant. All rights reserved.
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

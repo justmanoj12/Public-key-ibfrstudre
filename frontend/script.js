@@ -5,15 +5,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendButton = document.getElementById('send-button');
     const newChatBtn = document.getElementById('new-chat-btn');
     const recentChats = document.getElementById('recent-chats');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const chatContainer = document.querySelector('.chat-container');
 
     // Chat state
     let sessionId = localStorage.getItem('sessionId') || generateSessionId();
     let currentChat = JSON.parse(localStorage.getItem(`chat-${sessionId}`)) || [];
     let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
-    let typingIndicator = null; // Track loading indicator
+    let typingIndicator = null;
 
     // Initialize
     initializeChat();
+    setupResponsiveSidebar();
 
     function generateSessionId() {
         return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
@@ -29,20 +34,66 @@ document.addEventListener('DOMContentLoaded', function() {
         loadRecentChats();
     }
 
+    function setupResponsiveSidebar() {
+        if (window.innerWidth >= 768) {
+            // Desktop
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('expanded');
+        } else {
+            // Mobile
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+        }
+    }
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+        
+        // Adjust chat message widths when sidebar state changes
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.chat-message');
+            messages.forEach(msg => {
+                msg.style.maxWidth = mainContent.classList.contains('expanded') 
+                    ? '90%' 
+                    : 'calc(100% - 40px)';
+            });
+        }, 300); // Match the transition duration
+    }
+
     function showWelcomeMessage() {
-        addMessage("Welcome to your Goal Setting Assistant! 💪", 'bot-message');
-        addMessage("I can help you:", 'bot-message');
-        addMessage("- Set clear goals<br>- Break them into steps<br>- Track your progress<br>- Stay motivated", 'bot-message');
-        addMessage("What would you like to achieve today?", 'bot-message');
+        const messages = [
+            "Welcome to your Goal Setting Assistant! 💪",
+            "I can help you:",
+            "- Set clear goals<br>- Break them into steps<br>- Track your progress<br>- Stay motivated",
+            "What would you like to achieve today?"
+        ];
+    
+        let delay = 1000; // Start with 1 second delay
+        messages.forEach((msg, index) => {
+            setTimeout(() => {
+                addMessage(msg, 'bot-message');
+                // Scroll to bottom after each message
+                setTimeout(() => {
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }, 100);
+            }, delay * index); // Each message gets progressively longer delay
+        });
     }
 
     function addMessage(content, type) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('chat-message', type);
         messageElement.innerHTML = content.replace(/\n/g, '<br>');
+        
+        // Set appropriate width based on sidebar state
+        messageElement.style.maxWidth = mainContent.classList.contains('expanded') 
+            ? '90%' 
+            : 'calc(100% - 40px)';
+        
         chatLog.appendChild(messageElement);
         chatLog.scrollTop = chatLog.scrollHeight;
-        return messageElement; // Return reference to the message
+        return messageElement;
     }
 
     async function sendMessage() {
@@ -156,7 +207,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteChat(chat.id);
             });
             
-            chatItem.addEventListener('click', () => loadChat(chat.id));
+            chatItem.addEventListener('click', () => {
+                loadChat(chat.id);
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.add('collapsed');
+                }
+            });
             recentChats.appendChild(chatItem);
         });
     }
@@ -170,30 +226,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function deleteChat(chatId) {
-        // Remove from storage
-        localStorage.removeItem(`chat-${chatId}`);
         
-        // Update chat history
+        localStorage.removeItem(`chat-${chatId}`);
         chatHistory = chatHistory.filter(chat => chat.id !== chatId);
         localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
         
-        // If deleting current chat, start new one
         if (chatId === sessionId) startNewChat();
-        
-        // Refresh recent chats list
         loadRecentChats();
     }
-    
+
     function clearAllChats() {
-        // Remove all chats from storage
-        chatHistory.forEach(chat => localStorage.removeItem(`chat-${chat.id}`));
         
-        // Clear history
+        chatHistory.forEach(chat => {
+            localStorage.removeItem(`chat-${chat.id}`);
+        });
+        
+        // Reset all state variables
         chatHistory = [];
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        currentChat = [];
+        sessionId = generateSessionId();
         
-        // Start fresh chat
-        startNewChat();
+        // Update localStorage
+        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        localStorage.setItem('sessionId', sessionId);
+        
+        // Force UI updates
+        loadRecentChats();  // This will show "No recent conversations"
+        initializeChat();
     }
 
     function startNewChat() {
@@ -227,5 +286,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     newChatBtn.addEventListener('click', startNewChat);
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarToggle.addEventListener('touchstart', toggleSidebar);
     userInput.focus();
+
+    // Responsive behavior
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            // Desktop
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('expanded');
+        } else {
+            // Mobile
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+        }
+        
+        // Update message widths on resize
+        const messages = document.querySelectorAll('.chat-message');
+        messages.forEach(msg => {
+            msg.style.maxWidth = mainContent.classList.contains('expanded') 
+                ? '90%' 
+                : 'calc(100% - 40px)';
+        });
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth < 768 && 
+            !sidebar.contains(e.target) && 
+            e.target !== sidebarToggle && 
+            !sidebarToggle.contains(e.target) &&
+            !sidebar.classList.contains('collapsed')) {
+            toggleSidebar();
+        }
+    });
 });

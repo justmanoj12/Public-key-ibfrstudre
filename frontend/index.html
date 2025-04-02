@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goal Setting Assistant</title>
-    <link rel="icon" href="logo.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="sidebar">
+    <button class="sidebar-toggle" id="sidebar-toggle">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+        </svg>
+      </button>
+    
+    <div class="sidebar" id="sidebar">
         <div class="logo">Goal Setting Assistant</div>
         <button class="new-chat-btn" id="new-chat-btn">
             <span class="btn-icon">+</span> New chat
@@ -31,7 +36,7 @@
         </div>
     </div>
     
-    <div class="main-content">
+    <div class="main-content" id="main-content">
         <div class="chat-container" id="chat-log">
             <!-- Chat messages will appear here -->
             <div class="welcome-message">

@@ -424,3 +424,48 @@ body {
         padding-left: 10px;
     }
 }
+
+/* Main scrollbar styling (works in Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+    width: 10px; /* Vertical scrollbar width */
+    height: 10px; /* Horizontal scrollbar height */
+}
+
+::-webkit-scrollbar-track {
+    background: #2d2d2d; /* Dark grey track */
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555; /* Medium grey thumb */
+    border-radius: 5px;
+    border: 2px solid #2d2d2d; /* Matches track color */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #777; /* Lighter grey on hover */
+}
+
+/* Firefox support */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #555 #2d2d2d; /* thumb track */
+}
+
+/* Chat container scrollbar */
+.chat-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background: #666;
+}
+
+/* Sidebar scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #444;
+}

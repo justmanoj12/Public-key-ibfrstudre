@@ -9,16 +9,175 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainContent = document.getElementById('main-content');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const chatContainer = document.querySelector('.chat-container');
+    const voiceButton = document.getElementById('voice-button');
+    const speakResponseButton = document.getElementById('speak-response-button');
 
     // Chat state
     let sessionId = localStorage.getItem('sessionId') || generateSessionId();
     let currentChat = JSON.parse(localStorage.getItem(`chat-${sessionId}`)) || [];
     let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
     let typingIndicator = null;
+    let recognition = null;
+    let lastBotMessage = '';
 
     // Initialize
     initializeChat();
     setupResponsiveSidebar();
+    setupVoiceRecognition();
+
+    function setupVoiceRecognition() {
+        // Enhanced browser detection including Brave
+        const isBrave = navigator.brave && (navigator.brave.isBrave || (() => false))();
+        const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime) && !isBrave;
+        const isEdge = /Edg/.test(navigator.userAgent);
+        const isFirefox = typeof InstallTrigger !== 'undefined';
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    
+        // Check for basic support
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            voiceButton.disabled = true;
+            voiceButton.title = "Voice input not supported";
+            addMessage("Voice input works best in Chrome, Brave, and Edge browsers", 'bot-message');
+            return;
+        }
+    
+        // Initialize recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+    
+        // Browser-specific adjustments
+        if (isBrave) {
+            // Brave-specific settings
+            recognition.lang = 'en-US';
+        } else if (isFirefox) {
+            recognition.lang = 'en-US';
+            recognition.grammars = null;
+        } else if (isSafari) {
+            recognition.continuous = true;
+        }
+    
+        // Status messages
+        const voiceStatus = document.createElement('div');
+        voiceStatus.id = 'voice-status';
+        voiceStatus.style.cssText = 'margin-left: 80px; color: var(--text-secondary); font-size: 0.8em; display: none;';
+        document.querySelector('.input-options').prepend(voiceStatus);
+    
+        // Event handlers
+        recognition.onstart = () => {
+            voiceButton.classList.add('listening');
+            userInput.placeholder = "Listening...";
+            voiceStatus.textContent = "Listening... Speak now";
+            voiceStatus.style.display = 'block';
+            userInput.value = '';
+        };
+    
+        recognition.onerror = (event) => {
+            let errorMessage = "Voice input failed";
+            
+            // Browser-specific error handling
+            if (isBrave) {
+                errorMessage = "In Brave: 1) Click the Brave shield icon 2) Set 'Scripts' to 'Allow all' 3) Refresh page";
+            } else if (isFirefox) {
+                errorMessage = "Firefox requires HTTPS for voice input. Please use Chrome if on HTTP.";
+            } else if (isSafari) {
+                errorMessage = "Safari has limited voice support. Try longer phrases.";
+            }
+    
+            switch(event.error) {
+                case 'network':
+                    errorMessage = "Internet connection required for voice input";
+                    if (isBrave) {
+                        errorMessage += " (Brave may block cloud services. Use Chrome or Edge instead.)";
+                    }
+                    break;
+                case 'not-allowed':
+                    if (isBrave) {
+                        errorMessage = "Brave blocked microphone. Click the shield icon (🔰) to allow it.";
+                    } else if (isFirefox) {
+                        errorMessage = "In Firefox: 1) Click the padlock icon 2) Permissions 3) Allow microphone";
+                    } else {
+                        errorMessage = "Microphone access was blocked. Please allow it.";
+                    }
+                    break;
+            }
+    
+            voiceStatus.textContent = errorMessage;
+            voiceStatus.style.color = '#ff4444';
+            voiceButton.classList.remove('listening');
+            addMessage(errorMessage, 'bot-error');
+        };
+    
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            userInput.value = transcript;
+            userInput.focus();
+        
+            // Move cursor to end of text
+            setTimeout(() => {
+                userInput.selectionStart = userInput.selectionEnd = userInput.value.length;
+            }, 0);
+        };
+    
+        recognition.onend = () => {
+            voiceButton.classList.remove('listening');
+            userInput.placeholder = "Ask Chatbot";
+            voiceStatus.style.display = 'none';
+        };
+    
+        // Modified click handler with Brave-specific checks
+        voiceButton.addEventListener('click', async () => {
+            if (voiceButton.classList.contains('listening')) {
+                recognition.stop();
+                return;
+            }
+    
+            try {
+                // Special handling for Brave's privacy protections
+                if (isBrave) {
+                    try {
+                        const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+                        if (permissionStatus.state === 'denied') {
+                            addMessage("Brave has permanently blocked microphone. Change in settings.", 'bot-error');
+                            return;
+                        }
+                    } catch (e) {
+                        console.log("Permissions API not available");
+                    }
+                }
+    
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+                recognition.start();
+            } catch (err) {
+                let helpText = "Microphone access denied";
+                if (isBrave) {
+                    helpText += ". In Brave: 1) Click the shield icon (🔰) 2) Allow scripts 3) Refresh page";
+                } else if (isFirefox) {
+                    helpText += ". In Firefox, refresh the page after granting permission.";
+                }
+                addMessage(helpText, 'bot-error');
+            }
+        });
+    }
+
+    function speakText(text) {
+        if (!('speechSynthesis' in window)) {
+            console.warn('Text-to-speech not supported in this browser');
+            return;
+        }
+
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        window.speechSynthesis.speak(utterance);
+    }
 
     function generateSessionId() {
         return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
@@ -28,6 +187,9 @@ document.addEventListener('DOMContentLoaded', function() {
         chatLog.innerHTML = '';
         if (currentChat.length > 0) {
             currentChat.forEach(msg => addMessage(msg.content, msg.type));
+            // Store the last bot message for voice response
+            const lastBotMsg = currentChat.filter(msg => msg.type === 'bot-message').pop();
+            lastBotMessage = lastBotMsg ? lastBotMsg.content : '';
         } else {
             showWelcomeMessage();
         }
@@ -50,7 +212,6 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebar.classList.toggle('collapsed');
         mainContent.classList.toggle('expanded');
         
-        // Adjust chat message widths when sidebar state changes
         setTimeout(() => {
             const messages = document.querySelectorAll('.chat-message');
             messages.forEach(msg => {
@@ -58,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ? '90%' 
                     : 'calc(100% - 40px)';
             });
-        }, 300); // Match the transition duration
+        }, 300);
     }
 
     function showWelcomeMessage() {
@@ -69,15 +230,14 @@ document.addEventListener('DOMContentLoaded', function() {
             "What would you like to achieve today?"
         ];
     
-        let delay = 1000; // Start with 1 second delay
+        let delay = 1000;
         messages.forEach((msg, index) => {
             setTimeout(() => {
                 addMessage(msg, 'bot-message');
-                // Scroll to bottom after each message
                 setTimeout(() => {
                     chatLog.scrollTop = chatLog.scrollHeight;
                 }, 100);
-            }, delay * index); // Each message gets progressively longer delay
+            }, delay * index);
         });
     }
 
@@ -86,13 +246,18 @@ document.addEventListener('DOMContentLoaded', function() {
         messageElement.classList.add('chat-message', type);
         messageElement.innerHTML = content.replace(/\n/g, '<br>');
         
-        // Set appropriate width based on sidebar state
         messageElement.style.maxWidth = mainContent.classList.contains('expanded') 
             ? '90%' 
             : 'calc(100% - 40px)';
         
         chatLog.appendChild(messageElement);
         chatLog.scrollTop = chatLog.scrollHeight;
+
+        // Store the last bot message for voice response
+        if (type === 'bot-message') {
+            lastBotMessage = content;
+        }
+        
         return messageElement;
     }
 
@@ -100,12 +265,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const message = userInput.value.trim();
         if (!message) return;
 
-        // Add user message
         addMessage(message, 'user-message');
         currentChat.push({ content: message, type: 'user-message' });
         userInput.value = '';
 
-        // Show typing indicator
         typingIndicator = addMessage('<div class="typing-indicator"><span></span><span></span><span></span></div>', 'bot-message');
         
         try {
@@ -122,30 +285,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
             
-            // Remove typing indicator
             if (typingIndicator && typingIndicator.parentNode) {
                 chatLog.removeChild(typingIndicator);
             }
             
-            // Add bot response
             const botMessage = addMessage(data.response, 'bot-message');
             currentChat.push({ content: data.response, type: 'bot-message' });
             
-            // Save to history
             updateChatHistory();
 
         } catch (error) {
             console.error("Chat error:", error);
             
-            // Remove typing indicator if it exists
             if (typingIndicator && typingIndicator.parentNode) {
                 chatLog.removeChild(typingIndicator);
             }
             
-            // Add error message
             addMessage("Sorry, I'm having trouble connecting. Please try again later.", 'bot-error');
         } finally {
-            typingIndicator = null; // Reset indicator
+            typingIndicator = null;
         }
     }
 
@@ -154,7 +312,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         localStorage.setItem(`chat-${sessionId}`, JSON.stringify(currentChat));
         
-        // Update history
         const existingIndex = chatHistory.findIndex(chat => chat.id === sessionId);
         const lastMessage = currentChat[currentChat.length - 1].content;
         
@@ -185,14 +342,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Add clear button
         const clearBtn = document.createElement('button');
         clearBtn.className = 'clear-btn';
         clearBtn.textContent = 'Clear History';
         clearBtn.addEventListener('click', clearAllChats);
         recentChats.appendChild(clearBtn);
 
-        // Add chat items
         chatHistory.forEach(chat => {
             const chatItem = document.createElement('div');
             chatItem.className = 'chat-item';
@@ -226,7 +381,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function deleteChat(chatId) {
-        
         localStorage.removeItem(`chat-${chatId}`);
         chatHistory = chatHistory.filter(chat => chat.id !== chatId);
         localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
@@ -236,44 +390,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function clearAllChats() {
-        
         chatHistory.forEach(chat => {
             localStorage.removeItem(`chat-${chat.id}`);
         });
         
-        // Reset all state variables
         chatHistory = [];
         currentChat = [];
         sessionId = generateSessionId();
         
-        // Update localStorage
         localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
         localStorage.setItem('sessionId', sessionId);
         
-        // Force UI updates
-        loadRecentChats();  // This will show "No recent conversations"
+        loadRecentChats();
         initializeChat();
     }
 
     function startNewChat() {
-        // Confirm if current chat has messages
         if (currentChat.length > 0) {
-            updateChatHistory(); // Save current chat first
+            updateChatHistory();
         }
     
-        // Start fresh
         sessionId = generateSessionId();
         currentChat = [];
         
-        // Update storage
         localStorage.setItem(`chat-${sessionId}`, JSON.stringify(currentChat));
         localStorage.setItem('sessionId', sessionId);
         
-        // Reset UI
         chatLog.innerHTML = '';
         showWelcomeMessage();
         
-        // Reload recent chats to show new session
         loadRecentChats();
     }
 
@@ -288,21 +433,41 @@ document.addEventListener('DOMContentLoaded', function() {
     newChatBtn.addEventListener('click', startNewChat);
     sidebarToggle.addEventListener('click', toggleSidebar);
     sidebarToggle.addEventListener('touchstart', toggleSidebar);
+    
+    // Voice input button
+    voiceButton.addEventListener('click', () => {
+        if (recognition) {
+            recognition.start();
+        }
+    });
+    
+    // Speak response button
+    speakResponseButton.addEventListener('click', () => {
+        if (lastBotMessage) {
+            speakText(lastBotMessage);
+        } else {
+            addMessage("No response available to speak", 'bot-error');
+        }
+    });
+
+    // Check for speech synthesis support
+    if (!('speechSynthesis' in window)) {
+        speakResponseButton.disabled = true;
+        speakResponseButton.title = "Text-to-speech not supported in your browser";
+    }
+
     userInput.focus();
 
     // Responsive behavior
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 768) {
-            // Desktop
             sidebar.classList.remove('collapsed');
             mainContent.classList.remove('expanded');
         } else {
-            // Mobile
             sidebar.classList.add('collapsed');
             mainContent.classList.add('expanded');
         }
         
-        // Update message widths on resize
         const messages = document.querySelectorAll('.chat-message');
         messages.forEach(msg => {
             msg.style.maxWidth = mainContent.classList.contains('expanded') 
@@ -311,7 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Close sidebar when clicking outside on mobile
     document.addEventListener('click', (e) => {
         if (window.innerWidth < 768 && 
             !sidebar.contains(e.target) && 

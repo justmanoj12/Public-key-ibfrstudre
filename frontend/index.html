@@ -48,10 +48,25 @@
         
         <div class="input-container">
             <input type="text" id="user-input" placeholder="Ask Chatbot">
+            <button id="voice-button" class="voice-button">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M12 15C13.6569 15 15 13.6569 15 12V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V12C9 13.6569 10.3431 15 12 15Z" fill="currentColor"/>
+                    <path d="M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12M12 19V21M5 12H3M19 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
             <button id="send-button">
                 <svg class="send-icon" viewBox="0 0 24 24">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
                 </svg>
+            </button>
+        </div>
+        
+        <div class="input-options">
+            <button id="speak-response-button" class="option-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 5px;">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/>
+                </svg>
+                Speak Response
             </button>
         </div>
         

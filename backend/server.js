@@ -2,11 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} = require("@google/generative-ai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -36,23 +32,22 @@ app.post('/chat', async (req, res) => {
 
     try {
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash-thinking-exp-01-21",
+            model: "gemini-2.0-flash-thinking-exp-01-21", // Using free model
             generationConfig: {
-                temperature: 1,
+                temperature: 0.9, // Slightly lower for more focused responses
                 topP: 0.95,
                 topK: 40,
-                maxOutputTokens: 8192,
+                maxOutputTokens: 2048, // Reduced for free tier
                 responseMimeType: "text/plain",
             },
         });
-
+        
         const chatSession = model.startChat({
-            generationConfig,
             history: [
                 {
                     role: "user",
                     parts: [
-                        {text: "you are a chat bot that provides the goal setting assistance to people and how to achieve that goals in life where related to profession or personal life.\ntaking about providing answers to the user:-\n1. prefer a crisp answer\n2. try giving the steps in points when needed.\n3. No need to bold any text as it shows a unnecessary '*' symbol in the answer\n4. Make sure you answer tune is so polite that the user loves to talk with you"},
+                         {text: "you are a chat bot that provides the goal setting assistance to people and how to achieve that goals in life where related to profession or personal life.\ntaking about providing answers to the user:-\n1. prefer a crisp answer\n2. try giving the steps in points when needed.\n3. No need to bold any text as it shows a unnecessary '*' symbol in the answer\n4. Make sure you answer tune is so polite that the user loves to talk with you"},
                     ],
                 },
                 {
@@ -75,17 +70,17 @@ app.post('/chat', async (req, res) => {
                 },
             ],
         });
-
+        
         const result = await chatSession.sendMessage(message);
         res.json({
             response: result.response.text(),
             sessionId: sessionId || 'default-session'
         });
-
+        
     } catch (error) {
         console.error("Chat error:", error);
         res.status(500).json({
-            error: "I'm having trouble responding right now. Please ask me about goal setting!",
+            error: "I'm having trouble responding right now",
             details: error.message
         });
     }
@@ -93,5 +88,5 @@ app.post('/chat', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
-    console.log(`Goal Setting Assistant ready with gemini-2.0-flash-thinking-exp-01-21 model`);
+    console.log(`Using model: gemini-2.0-flash-thinking-exp-01-21`);
 });

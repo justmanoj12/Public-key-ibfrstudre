@@ -68,18 +68,25 @@ app.post('/chat', async (req, res) => {
                         {text: "Understood! From now on, I will focus solely on goal-related inquiries. If a user asks a question outside of goal setting, I will politely redirect them by saying something like, \"That's an interesting question, but I'm designed to help you with goal setting. What goal are you currently working towards, or would you like help defining one?\"\n\nI'm ready to assist you with your goals whenever you're ready!"},
                     ],
                 },
+                {
+                    role: "user",
+                    parts: [
+                      {text: "remove the unnecessary '**' symbol from the response of chatbot"},
+                    ],
+                },
+                {
+                    role: "model",
+                    parts: [
+                      {text: "Understood! I have removed any formatting that might cause the unwanted symbols. I will provide plain text responses from now on.\n"},
+                    ],
+                },
             ],
         });
         
         const result = await chatSession.sendMessage(message);
-        let responseText = result.response.text();
-        
-        // Convert **bold** text to HTML <strong> tags
-        responseText = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         res.json({
             response: result.response.text(),
-            sessionId: sessionId || 'default-session',
-            isHtml: true 
+            sessionId: sessionId || 'default-session'
         });
         
     } catch (error) {

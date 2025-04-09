@@ -556,6 +556,18 @@ body {
     animation: pulse 1.5s infinite;
 }
 
+/* Add this to your style.css */
+#stop-speech-button.active {
+    background-color: #ff4444;
+    border-color: #ff4444;
+    color: white;
+}
+
+#stop-speech-button.active:hover {
+    background-color: #cc0000;
+    border-color: #cc0000;
+}
+
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }

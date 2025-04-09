@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatContainer = document.querySelector('.chat-container');
     const voiceButton = document.getElementById('voice-button');
     const speakResponseButton = document.getElementById('speak-response-button');
-
+    const stopSpeechButton = document.getElementById('stop-speech-button');
     // Chat state
     let sessionId = localStorage.getItem('sessionId') || generateSessionId();
     let currentChat = JSON.parse(localStorage.getItem(`chat-${sessionId}`)) || [];
@@ -176,8 +176,32 @@ document.addEventListener('DOMContentLoaded', function() {
         utterance.rate = 1;
         utterance.pitch = 1;
         utterance.volume = 1;
+        speakResponseButton.style.display = 'none';
+        stopSpeechButton.style.display = 'flex';
+        stopSpeechButton.classList.add('active');
+    
+        utterance.onend = () => {
+        // When speech ends, show speak button and hide stop button
+            stopSpeechButton.style.display = 'none';
+            speakResponseButton.style.display = 'flex';
+            stopSpeechButton.classList.remove('active');
+        };
+    
+        utterance.onerror = () => {
+            // If there's an error, reset the buttons
+            stopSpeechButton.style.display = 'none';
+            speakResponseButton.style.display = 'flex';
+            stopSpeechButton.classList.remove('active');
+        };
         window.speechSynthesis.speak(utterance);
     }
+
+    stopSpeechButton.addEventListener('click', () => {
+        window.speechSynthesis.cancel();
+        stopSpeechButton.style.display = 'none';
+        speakResponseButton.style.display = 'flex';
+        stopSpeechButton.classList.remove('active');
+    });
 
     function generateSessionId() {
         return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
@@ -443,7 +467,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Speak response button
     speakResponseButton.addEventListener('click', () => {
-        if (lastBotMessage) {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            stopSpeechButton.style.display = 'none';
+            speakResponseButton.style.display = 'flex';
+            stopSpeechButton.classList.remove('active');
+        } else if (lastBotMessage) {
             speakText(lastBotMessage);
         } else {
             addMessage("No response available to speak", 'bot-error');

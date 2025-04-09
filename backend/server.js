@@ -72,9 +72,14 @@ app.post('/chat', async (req, res) => {
         });
         
         const result = await chatSession.sendMessage(message);
+        let responseText = result.response.text();
+        
+        // Convert **bold** text to HTML <strong> tags
+        responseText = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         res.json({
             response: result.response.text(),
-            sessionId: sessionId || 'default-session'
+            sessionId: sessionId || 'default-session',
+            isHtml: true 
         });
         
     } catch (error) {

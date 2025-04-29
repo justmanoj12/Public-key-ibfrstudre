@@ -248,10 +248,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showWelcomeMessage() {
         const messages = [
-            "Welcome to your Goal Setting Assistant! 💪",
-            "I can help you:",
-            "- Set clear goals<br>- Break them into steps<br>- Track your progress<br>- Stay motivated",
-            "What would you like to achieve today?"
+            "Welcome to the Public Transit Tracker! 🚌🚆",
+            "I can help you with:",
+            "- Real-time transit updates<br>- Route planning<br>- Schedule tracking",
+            "How can I assist you with your transit needs today?"
         ];
     
         let delay = 1000;
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
         typingIndicator = addMessage('<div class="typing-indicator"><span></span><span></span><span></span></div>', 'bot-message');
         
         try {
-            const response = await fetch('https://goal-setting-assistant-server.onrender.com/chat', {
+            const response = await fetch('http://localhost:3000/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message, sessionId })

@@ -1,15 +1,15 @@
 :root {
-    --primary-color: #1a73e8;
-    --primary-hover: #0d5bba;
-    --background-dark: #121212;
-    --sidebar-dark: #1e1e1e;
-    --text-primary: #ffffff;
-    --text-secondary: #aaaaaa;
-    --hover-color: #2a2a2a;
-    --border-color: #333333;
-    --user-message-bg: #2d2d2d;
-    --bot-message-bg: #1a73e8;
-    --welcome-bg: rgba(26, 115, 232, 0.1);
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --background-dark: #f8f9fa;
+    --sidebar-dark: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #6c757d;
+    --hover-color: #e2e6ea;
+    --border-color: #dee2e6;
+    --user-message-bg: #e9ecef;
+    --bot-message-bg: #007bff;
+    --welcome-bg: rgba(0, 123, 255, 0.1);
     --sidebar-width: 250px;
 }
 
@@ -40,11 +40,12 @@ body {
     justify-content: center;
     cursor: pointer;
     z-index: 100;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .sidebar-toggle:hover {
-    background-color: var(--hover-color);
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
 }
 
 .sidebar {
@@ -105,12 +106,12 @@ body {
     margin-bottom: 30px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
 }
 
 .new-chat-btn:hover {
     background-color: var(--primary-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px) scale(1.02);
 }
 
 .btn-icon {
@@ -159,7 +160,7 @@ body {
     margin-bottom: 5px;
     cursor: pointer;
     color: var(--text-primary);
-    transition: background-color 0.2s;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .chat-item-content {
@@ -205,6 +206,7 @@ body {
 
 .chat-item:hover {
     background-color: var(--hover-color);
+    transform: scale(1.02);
 }
 
 .chat-item::before {
@@ -334,11 +336,12 @@ body {
     font-size: 14px;
     cursor: pointer;
     color: var(--text-primary);
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
 }
 
 .option-btn:hover {
-    background-color: var(--hover-color);
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
 }
 
 .option-btn.primary {

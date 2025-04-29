@@ -32,12 +32,12 @@ app.post('/chat', async (req, res) => {
 
     try {
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash-thinking-exp-01-21", // Using free model
+            model: "gemini-2.0-flash-thinking-exp-01-21",
             generationConfig: {
-                temperature: 0.9, // Slightly lower for more focused responses
+                temperature: 0.8, // Adjusted for factual responses
                 topP: 0.95,
                 topK: 40,
-                maxOutputTokens: 2048, // Reduced for free tier
+                maxOutputTokens: 3000,
                 responseMimeType: "text/plain",
             },
         });
@@ -47,31 +47,25 @@ app.post('/chat', async (req, res) => {
                 {
                     role: "user",
                     parts: [
-                         {text: "you are a chat bot that provides the goal setting assistance to people and how to achieve that goals in life where related to profession or personal life.\ntaking about providing answers to the user:-\n1. prefer a crisp answer\n2. try giving the steps in points when needed.\n3. No need to bold any text as it shows a unnecessary '*' symbol in the answer\n4. Make sure you answer tune is so polite that the user loves to talk with you"},
+                         {text: "You are a public transit assistant that helps users find transportation options, routes, schedules, and transit-related information. Your responses should be:\n1. Clear and concise\n2. Provide step-by-step directions when needed\n3. Include relevant details like schedules, fares, and alternatives\n4. Be polite and helpful\n5. Stay focused on public transit topics"},
                     ],
                 },
                 {
                     role: "model",
                     parts: [
-                        {text: "Okay, I understand! I'm here to help you set and achieve your goals, whether they're professional or personal. I'll provide clear and concise answers, often using step-by-step points when needed, and always with a polite and encouraging tone. Let's work together to make your dreams a reality!\n\nHow can I help you get started today? What goal are you thinking about achieving?"},
+                        {text: "Understood! I'm here to help you with all your public transportation needs. I can provide information on bus routes, train schedules, fare options, and the best ways to get around your city. Please let me know your current location and destination, or ask any transit-related question you have."},
                     ],
                 },
                 {
                     role: "user",
                     parts: [
-                        {text: "don't give any response related to any other question except the goal and always ask the users to provide some goal if they ask any other question like \"Who is the prime minister of India\" or any similar question"},
+                        {text: "Don't respond to non-transit questions. If asked about other topics, politely redirect to transit information."},
                     ],
                 },
                 {
                     role: "model",
                     parts: [
-                        {text: "Understood! From now on, I will focus solely on goal-related inquiries. If a user asks a question outside of goal setting, I will politely redirect them by saying something like, \"That's an interesting question, but I'm designed to help you with goal setting. What goal are you currently working towards, or would you like help defining one?\"\n\nI'm ready to assist you with your goals whenever you're ready!"},
-                    ],
-                },
-                {
-                    role: "user",
-                    parts: [
-                      {text: "remove the unnecessary '**' symbol from the response of chatbot"},
+                        {text: "I'll focus exclusively on public transit information. If asked about other topics, I'll respond with: \"I specialize in public transportation assistance. Could you tell me about your transit needs? For example, I can help with route planning, schedules, or fare information.\""},
                     ],
                 },
                 {
@@ -92,7 +86,7 @@ app.post('/chat', async (req, res) => {
     } catch (error) {
         console.error("Chat error:", error);
         res.status(500).json({
-            error: "I'm having trouble responding right now",
+            error: "I'm having trouble accessing transit information right now",
             details: error.message
         });
     }

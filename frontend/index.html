@@ -3,86 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Transit Scheduler</title>
+    <title>Transit Tracker - Your Public Transport Companion</title>
+    <link rel="stylesheet" href="landing.css">
     <link rel="icon" href="image.png" type="image/png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <button class="sidebar-toggle" id="sidebar-toggle">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
-        </svg>
-      </button>
-    
-    <div class="sidebar" id="sidebar">
-        <div class="logo">Public Transit Scheduler</div>
-        <button class="new-chat-btn" id="new-chat-btn">
-            <span class="btn-icon">+</span> New chat
-        </button>
-        
-        <div class="section-title">Recent</div>
-        <div class="recent-chats" id="recent-chats">
-            <!-- Recent chats will be populated here with delete buttons -->
-        </div>
-        
-        <div class="about-section">
-            <div class="section-title">About Us</div>
-            <div class="team-member">SarvepaliSathvik (12318538)</div>
-            <div class="team-member"> Rongali Pradeep (12316752)</div>
-            <div class="team-member">Manoj Kumar G (12320409)</div>
-        </div>
-        
-        <div class="user-info">
-            Hello, User
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Welcome to Transit Tracker</h2>
+            <p>Please create an account or login to access our services</p>
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Login</button>
+                <button class="tab-btn" data-tab="signup">Sign Up</button>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <form id="signupForm" class="auth-form" style="display: none;">
+                <input type="text" placeholder="Full Name" required>
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <input type="password" placeholder="Confirm Password" required>
+                <button type="submit">Sign Up</button>
+            </form>
         </div>
     </div>
-    
-    <div class="main-content" id="main-content">
-        <div class="chat-container" id="chat-log">
-            <!-- Chat messages will appear here -->
-            <div class="welcome-message">
-                <h2>Welcome to Public Transit Scheduler</h2>
-                <p>Start a new conversation or continue a previous one</p>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-bus"></i>
+            <span>Transit Tracker</span>
+        </div>
+        <div class="nav-links">
+            <a href="landing.html" class="active">Home</a>
+            <a href="route-planner.html">Route Planner</a>
+            <button id="loginBtn" class="login-button">Login</button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Your Smart Public Transport Companion</h1>
+            <p>Get real-time updates, plan your journey, and never miss your bus or train again</p>
+            <button id="toggleChatbot" class="hero-button" onclick="window.location.href='index.html'">Open Chatbot <i class="fas fa-comments"></i></button>
+        </div>
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Public Transport">
+        </div>
+    </header>
+
+    <section class="features" id="features">
+        <h2>Our Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-comments"></i>
+                <h3>Smart Chatbot</h3>
+                <p>Get instant answers about transit schedules, routes, and delays through our AI-powered chatbot.</p>
+                <button class="feature-button" onclick="window.location.href='index.html'">Ask me</button>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-route"></i>
+                <h3>Route Planner</h3>
+                <p>Plan your journey with our interactive route planner. Find the best routes for driving, walking, cycling, or public transport.</p>
+                <button class="feature-button" onclick="window.location.href='route-planner.html'">Best Routes</button>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-bell"></i>
+                <h3>Real-time Updates</h3>
+                <p>Stay informed with live updates about delays, cancellations, and service changes.</p>
+                <button class="feature-button" id="showUpdates">View Updates</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Start Chatting</h3>
+                <p>Open our chatbot and ask about your route or schedule</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Get Information</h3>
+                <p>Receive instant, accurate information about your journey</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Plan Your Trip</h3>
+                <p>Plan your journey with confidence and real-time updates</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Contact Us</h2>
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <p>support@transittracker.com</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <p>+1 (555) 123-4567</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>123 Transit Street, City, Country</p>
+                </div>
+            </div>
+            <div class="contact-form">
+                <form>
+                    <input type="text" placeholder="Your Name">
+                    <input type="email" placeholder="Your Email">
+                    <textarea placeholder="Your Message"></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chatbot Interface -->
+    <div id="chatbotContainer" class="chat-container" style="display: none;">
+        <header>
+            <h1><i class="fas fa-comments"></i> Transit Tracker</h1>
+            <button id="closeChatbot" class="close-modal">&times;</button>
+        </header>
+        
+        <div class="chat-box" id="chatBox">
+            <div class="bot-message">
+                <p>Hello! I can help you find public transit schedules. Ask me about bus or train times, routes, or delays.</p>
             </div>
         </div>
         
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Ask Chatbot">
-            <button id="voice-button" class="voice-button">
-                <svg viewBox="0 0 24 24" width="24" height="24">
-                    <path d="M12 15C13.6569 15 15 13.6569 15 12V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V12C9 13.6569 10.3431 15 12 15Z" fill="currentColor"/>
-                    <path d="M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12M12 19V21M5 12H3M19 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </button>
-            <button id="send-button">
-                <svg class="send-icon" viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <div class="input-options">
-            <button id="speak-response-button" class="option-btn">
-                <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 5px;">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/>
-                </svg>
-                Speak Response
-            </button>
-            <button id="stop-speech-button" class="option-btn" style="display: none;">
-                <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 5px;">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/>
-                </svg>
-                Stop
-            </button>
-        </div>
-        
-        <div class="copyright-notice">
-            &copy; 2025 Public Transit Scheduler. All rights reserved.
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Ask about transit schedules...">
+            <button id="sendButton">Send</button>
         </div>
     </div>
-    
-    <button class="ask-button" onclick="window.location.href='landing.html'">Ask Me Transit Tracker</button>
-    
+
+    <!-- Updates Modal -->
+    <div id="updatesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Real-time Updates</h2>
+            <div class="updates-container">
+                <div class="update-card">
+                    <i class="fas fa-bus"></i>
+                    <div class="update-info">
+                        <h3>Bus Service Updates</h3>
+                        <p class="update-time">Last updated: 5 minutes ago</p>
+                        <ul class="update-list">
+                            <li>Route 101: 15-minute delay due to traffic</li>
+                            <li>Route 202: Service resumed after maintenance</li>
+                            <li>Route 303: New schedule effective today</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="update-card">
+                    <i class="fas fa-train"></i>
+                    <div class="update-info">
+                        <h3>Train Service Updates</h3>
+                        <p class="update-time">Last updated: 10 minutes ago</p>
+                        <ul class="update-list">
+                            <li>Red Line: Normal service</li>
+                            <li>Blue Line: 10-minute delay due to signal issues</li>
+                            <li>Green Line: Weekend maintenance schedule</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="update-card">
+                    <i class="fas fa-subway"></i>
+                    <div class="update-info">
+                        <h3>Subway Updates</h3>
+                        <p class="update-time">Last updated: 15 minutes ago</p>
+                        <ul class="update-list">
+                            <li>Line A: Normal service</li>
+                            <li>Line B: Reduced frequency during peak hours</li>
+                            <li>Line C: Platform maintenance at Central Station</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-bus"></i>
+                <span>Transit Tracker</span>
+            </div>
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#contact">Contact</a>
+                <a href="#">Chatbot</a>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Transit Tracker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="landing.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html> 

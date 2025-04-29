@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+    res.sendFile(path.join(__dirname, '../frontend', 'chatbot.html'));
 });
 
 app.post('/chat', async (req, res) => {
